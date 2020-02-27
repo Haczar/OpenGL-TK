@@ -1,4 +1,4 @@
-﻿namespace LearnOpenTK
+﻿namespace OpenGL_TK
 {
     public static class Program
     {

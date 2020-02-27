@@ -1,11 +1,10 @@
-﻿using System;
+﻿using OpenGLCompGraph;
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
-using LearnOpenTK.Common;
-
-namespace LearnOpenTK
+namespace OpenGL_TK
 {
     // In this tutorial we take the code from the last tutorial and create some level of abstraction over it allowing more
     // control of the interaction between the light and the material.
@@ -62,18 +61,17 @@ namespace LearnOpenTK
         private readonly Vector3 _lightPos = new Vector3(1.2f, 1.0f, 2.0f);
 
         private int _vertexBufferObject;
-
-        private int _vaoModel;
-
-        private int _vaoLamp;
-
-        private Shader _lampShader;
-
-        private Shader _lightingShader;
-
-        private Camera _camera;
+        private int _vertexArrayObject_Model;
+        private int _vertexArrayObject_Lamp;
 
         private bool _firstMove = true;
+
+        private Shader _lampShader;
+        private Shader _modelShader;
+
+        private Model importedModel;
+
+        private Camera _camera;
 
         private Vector2 _lastPos;
 
@@ -85,41 +83,48 @@ namespace LearnOpenTK
         protected override void OnLoad(EventArgs e)
         {
             GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            
+            CursorVisible = false;
+
+            _modelShader = new Shader("Shaders/shader.vert", "Shaders/lighting.frag");
+            _lampShader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
 
             GL.Enable(EnableCap.DepthTest);
 
-            _vertexBufferObject = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
-
-            _lightingShader = new Shader("Shaders/shader.vert", "Shaders/lighting.frag");
-            _lampShader = new Shader("Shaders/shader.vert", "Shaders/shader.frag");
-
-            _vaoModel = GL.GenVertexArray();
-            GL.BindVertexArray(_vaoModel);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-
-            var positionLocation = _lightingShader.GetAttribLocation("aPos");
-            GL.EnableVertexAttribArray(positionLocation);
-            GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-
-            var normalLocation = _lightingShader.GetAttribLocation("aNormal");
-            GL.EnableVertexAttribArray(normalLocation);
-            GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-
-            _vaoLamp = GL.GenVertexArray();
-            GL.BindVertexArray(_vaoLamp);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-
-            positionLocation = _lampShader.GetAttribLocation("aPos");
-            GL.EnableVertexAttribArray(positionLocation);
-            GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-
             _camera = new Camera(Vector3.UnitZ * 3, Width / (float)Height);
 
-            CursorVisible = false;
+            //Model Load
+            importedModel = new Model("Models/bunny.obj");
+            importedModel.LoadModel();
+            importedModel.BufferModel();
+                                          
+            //_vertexBufferObject = GL.GenBuffer();
+            //GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+            //GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+
+
+
+            //_vertexArrayObject_Model = GL.GenVertexArray();
+            //GL.BindVertexArray(_vertexArrayObject_Model);
+
+            //GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+
+            //var positionLocation = _modelShader.GetAttribLocation("aPos");
+            //GL.EnableVertexAttribArray(positionLocation);
+            //GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+
+            //var normalLocation = _modelShader.GetAttribLocation("aNormal");
+            //GL.EnableVertexAttribArray(normalLocation);
+            //GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+
+            //_vertexArrayObject_Lamp = GL.GenVertexArray();
+            //GL.BindVertexArray(_vertexArrayObject_Lamp);
+
+            //GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+
+            //positionLocation = _lampShader.GetAttribLocation("aPos");
+            //GL.EnableVertexAttribArray(positionLocation);
+            //GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
 
             base.OnLoad(e);
         }
@@ -128,22 +133,22 @@ namespace LearnOpenTK
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            GL.BindVertexArray(_vaoModel);
+            //GL.BindVertexArray(_vertexArrayObject_Model);
 
-            _lightingShader.Use();
+            _modelShader.Use();
 
-            _lightingShader.SetMatrix4("model", Matrix4.Identity);
-            _lightingShader.SetMatrix4("view", _camera.GetViewMatrix());
-            _lightingShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
+            _modelShader.SetMatrix4("model", Matrix4.Identity);
+            _modelShader.SetMatrix4("view", _camera.GetViewMatrix());
+            _modelShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
 
-            _lightingShader.SetVector3("viewPos", _camera.Position);
+            _modelShader.SetVector3("viewPos", _camera.Position);
 
             // Here we set the material values of the cube, the material struct is just a container so to access
             // the underlying values we simply type "material.value" to get the location of the uniform
-            _lightingShader.SetVector3("material.ambient", new Vector3(1.0f, 0.5f, 0.31f));
-            _lightingShader.SetVector3("material.diffuse", new Vector3(1.0f, 0.5f, 0.31f));
-            _lightingShader.SetVector3("material.specular", new Vector3(0.5f, 0.5f, 0.5f));
-            _lightingShader.SetFloat("material.shininess", 32.0f);
+            _modelShader.SetVector3("material.ambient", new Vector3(1.0f, 0.5f, 0.31f));
+            _modelShader.SetVector3("material.diffuse", new Vector3(1.0f, 0.5f, 0.31f));
+            _modelShader.SetVector3("material.specular", new Vector3(0.5f, 0.5f, 0.5f));
+            _modelShader.SetFloat("material.shininess", 32.0f);
 
             // This is where we change the lights color over time using the sin function
             Vector3 lightColor;
@@ -156,14 +161,16 @@ namespace LearnOpenTK
             Vector3 ambientColor = lightColor * new Vector3(0.2f);
             Vector3 diffuseColor = lightColor * new Vector3(0.5f);
 
-            _lightingShader.SetVector3("light.position", _lightPos);
-            _lightingShader.SetVector3("light.ambient", ambientColor);
-            _lightingShader.SetVector3("light.diffuse", diffuseColor);
-            _lightingShader.SetVector3("light.specular", new Vector3(1.0f, 1.0f, 1.0f));
+            _modelShader.SetVector3("light.position", _lightPos);
+            _modelShader.SetVector3("light.ambient", ambientColor);
+            _modelShader.SetVector3("light.diffuse", diffuseColor);
+            _modelShader.SetVector3("light.specular", new Vector3(1.0f, 1.0f, 1.0f));
 
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            //GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
 
-            GL.BindVertexArray(_vaoModel);
+            importedModel.RenderModel();
+
+            //GL.BindVertexArray(_vertexArrayObject_Model);
 
             _lampShader.Use();
 
@@ -174,8 +181,12 @@ namespace LearnOpenTK
             _lampShader.SetMatrix4("model", lampMatrix);
             _lampShader.SetMatrix4("view", _camera.GetViewMatrix());
             _lampShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
-
             GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+
+            GL.BindVertexArray(_vertexArrayObject_Lamp);
+
+
+            GL.BindVertexArray(0);
 
             SwapBuffers();
 
@@ -254,12 +265,6 @@ namespace LearnOpenTK
             base.OnMouseMove(e);
         }
 
-        protected override void OnMouseWheel(MouseWheelEventArgs e)
-        {
-            _camera.Fov -= e.DeltaPrecise;
-            base.OnMouseWheel(e);
-        }
-
         protected override void OnResize(EventArgs e)
         {
             GL.Viewport(0, 0, Width, Height);
@@ -274,11 +279,11 @@ namespace LearnOpenTK
             GL.UseProgram(0);
 
             GL.DeleteBuffer(_vertexBufferObject);
-            GL.DeleteVertexArray(_vaoModel);
-            GL.DeleteVertexArray(_vaoLamp);
+            GL.DeleteVertexArray(_vertexArrayObject_Model);
+            GL.DeleteVertexArray(_vertexArrayObject_Lamp);
 
             GL.DeleteProgram(_lampShader.Handle);
-            GL.DeleteProgram(_lightingShader.Handle);
+            GL.DeleteProgram(_modelShader.Handle);
 
             base.OnUnload(e);
         }

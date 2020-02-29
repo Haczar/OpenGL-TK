@@ -7,25 +7,15 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace OpenGL_TK
 {
-    // A simple class meant to help create shaders.
+    //Class that handles shaders
     public class Shader
     {
         public readonly int Handle;
 
         private readonly Dictionary<string, int> _uniformLocations;
 
-        // This is how you create a simple shader.
-        // Shaders are written in GLSL, which is a language very similar to C in its semantics.
-        // The GLSL source is compiled *at runtime*, so it can optimize itself for the graphics card it's currently being used on.
-        // A commented example of GLSL can be found in shader.vert
         public Shader(string vertPath, string fragPath)
         {
-            // There are several different types of shaders, but the only two you need for basic rendering are the vertex and fragment shaders.
-            // The vertex shader is responsible for moving around vertices, and uploading that data to the fragment shader.
-            //   The vertex shader won't be too important here, but they'll be more important later.
-            // The fragment shader is responsible for then converting the vertices to "fragments", which represent all the data OpenGL needs to draw a pixel.
-            //   The fragment shader is what we'll be using the most here.
-
             // Load vertex shader and compile
             // LoadSource is a simple function that just loads all text from the file whose path is given.
             var shaderSource = LoadSource(vertPath);
@@ -102,6 +92,11 @@ namespace OpenGL_TK
             }
         }
 
+        public int GetAttribLocation(string attribName)
+        {
+            return GL.GetAttribLocation(Handle, attribName);
+        }
+
         private static void LinkProgram(int program)
         {
             // We link the program
@@ -116,20 +111,6 @@ namespace OpenGL_TK
             }
         }
 
-        // A wrapper function that enables the shader program.
-        public void Use()
-        {
-            GL.UseProgram(Handle);
-        }
-
-        // The shader sources provided with this project use hardcoded layout(location)-s. If you want to do it dynamically,
-        // you can omit the layout(location=X) lines in the vertex shader, and use this in VertexAttribPointer instead of the hardcoded values.
-        public int GetAttribLocation(string attribName)
-        {
-            return GL.GetAttribLocation(Handle, attribName);
-        }
-
-        // Just loads the entire file into a string.
         private static string LoadSource(string path)
         {
             using (var sr = new StreamReader(path, Encoding.UTF8))
@@ -138,49 +119,29 @@ namespace OpenGL_TK
             }
         }
 
-        /// <summary>
-        /// Set a uniform int on this shader.
-        /// </summary>
-        /// <param name="name">The name of the uniform</param>
-        /// <param name="data">The data to set</param>
-        public void SetInt(string name, int data)
+        public void Use()
         {
             GL.UseProgram(Handle);
-            GL.Uniform1(_uniformLocations[name], data);
         }
 
-        /// <summary>
-        /// Set a uniform float on this shader.
-        /// </summary>
-        /// <param name="name">The name of the uniform</param>
-        /// <param name="data">The data to set</param>
         public void SetFloat(string name, float data)
         {
             GL.UseProgram(Handle);
             GL.Uniform1(_uniformLocations[name], data);
         }
 
-        /// <summary>
-        /// Set a uniform Matrix4 on this shader
-        /// </summary>
-        /// <param name="name">The name of the uniform</param>
-        /// <param name="data">The data to set</param>
-        /// <remarks>
-        ///   <para>
-        ///   The matrix is transposed before being sent to the shader.
-        ///   </para>
-        /// </remarks>
+        public void SetInt(string name, int data)
+        {
+            GL.UseProgram(Handle);
+            GL.Uniform1(_uniformLocations[name], data);
+        }
+
         public void SetMatrix4(string name, Matrix4 data)
         {
             GL.UseProgram(Handle);
             GL.UniformMatrix4(_uniformLocations[name], true, ref data);
         }
 
-        /// <summary>
-        /// Set a uniform Vector3 on this shader.
-        /// </summary>
-        /// <param name="name">The name of the uniform</param>
-        /// <param name="data">The data to set</param>
         public void SetVector3(string name, Vector3 data)
         {
             GL.UseProgram(Handle);

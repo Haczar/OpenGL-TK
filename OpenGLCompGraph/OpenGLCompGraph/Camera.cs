@@ -5,21 +5,30 @@ namespace OpenGL_TK
 {
     public class Camera
     {
-        // Those vectors are directions pointing outwards from the camera to define how it rotated
+        
+        //Those vectors are directions pointing outwards from the camera to define how it rotated
         private Vector3 _front = -Vector3.UnitZ;
+        private Vector3 _up    =  Vector3.UnitY;
+        private Vector3 _right =  Vector3.UnitX;
 
-        private Vector3 _up = Vector3.UnitY;
-
-        private Vector3 _right = Vector3.UnitX;
-
-        // Rotation around the X axis (radians)
+        //Rotation around the X axis (radians)
         private float _pitch;
+        //Rotation around the Y axis (radians)
+        private float _yaw = -MathHelper.PiOver2; 
+        //The field of view of the camera (radians)
+        private float _fov =  MathHelper.PiOver2;
 
-        // Rotation around the Y axis (radians)
-        private float _yaw = -MathHelper.PiOver2; // Without this you would be started rotated 90 degrees right
+        //The position of the camera
+        public Vector3 Position
+        {
+            get; set;
+        }
 
-        // The field of view of the camera (radians)
-        private float _fov = MathHelper.PiOver2;
+        //Aspect Ratio of the viewport used for the projection matrix
+        public float AspectRatio
+        {
+            private get; set;
+        }
 
         public Camera(Vector3 position, float aspectRatio)
         {
@@ -27,19 +36,12 @@ namespace OpenGL_TK
             AspectRatio = aspectRatio;
         }
 
-        // The position of the camera
-        public Vector3 Position { get; set; }
-
-        // This is simply the aspect ratio of the viewport, used for the projection matrix
-        public float AspectRatio { private get; set; }
-
         public Vector3 Front => _front;
 
         public Vector3 Up => _up;
 
         public Vector3 Right => _right;
 
-        // We convert from degrees to radians as soon as the property is set to improve performance
         public float Pitch
         {
             get => MathHelper.RadiansToDegrees(_pitch);
@@ -54,7 +56,6 @@ namespace OpenGL_TK
             }
         }
 
-        // We convert from degrees to radians as soon as the property is set to improve performance
         public float Yaw
         {
             get => MathHelper.RadiansToDegrees(_yaw);
@@ -65,9 +66,6 @@ namespace OpenGL_TK
             }
         }
 
-        // The field of view (FOV) is the vertical angle of the camera view, this has been discussed more in depth in a
-        // previous tutorial, but in this tutorial you have also learned how we can use this to simulate a zoom feature.
-        // We convert from degrees to radians as soon as the property is set to improve performance
         public float Fov
         {
             get => MathHelper.RadiansToDegrees(_fov);
@@ -78,32 +76,27 @@ namespace OpenGL_TK
             }
         }
 
-        // Get the view matrix using the amazing LookAt function described more in depth on the web tutorials
         public Matrix4 GetViewMatrix()
         {
             return Matrix4.LookAt(Position, Position + _front, _up);
         }
 
-        // Get the projection matrix using the same method we have used up until this point
         public Matrix4 GetProjectionMatrix()
         {
             return Matrix4.CreatePerspectiveFieldOfView(_fov, AspectRatio, 0.01f, 100f);
         }
 
-        // This function is going to update the direction vertices using some of the math learned in the web tutorials
+        //Update the direction vertices
         private void UpdateVectors()
         {
-            // First the front matrix is calculated using some basic trigonometry
+            // Front matrix math
             _front.X = (float)Math.Cos(_pitch) * (float)Math.Cos(_yaw);
             _front.Y = (float)Math.Sin(_pitch);
             _front.Z = (float)Math.Cos(_pitch) * (float)Math.Sin(_yaw);
 
-            // We need to make sure the vectors are all normalized, as otherwise we would get some funky results
             _front = Vector3.Normalize(_front);
 
             // Calculate both the right and the up vector using cross product
-            // Note that we are calculating the right from the global up, this behaviour might
-            // not be what you need for all cameras so keep this in mind if you do not want a FPS camera
             _right = Vector3.Normalize(Vector3.Cross(_front, Vector3.UnitY));
             _up = Vector3.Normalize(Vector3.Cross(_right, _front));
         }

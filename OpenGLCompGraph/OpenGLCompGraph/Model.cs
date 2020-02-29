@@ -3,42 +3,15 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Graphics;
 using OpenTK;
 
 namespace OpenGLCompGraph
 {
-    public static class ListExtras
-    {
-        public static void Resize<T>(this List<T> list, int size, T element = default(T))
-        {
-            int count = list.Count;
-
-            if (size < count)
-            {
-                list.RemoveRange(size, count - size);
-            }
-            else if (size > count)
-            {
-                if (size > list.Capacity)
-                {
-                    list.Capacity = size;
-                }
-
-                list.AddRange(Enumerable.Repeat(element, size - count));
-            }
-        }
-
-        public static int FaceSizeInBytes = sizeof(uint) * 3;
-    }
-    
     public struct Face
     {
-        public uint a, b, c;
+        public uint vert0, vert1, vert2;
     }
-
 
     public class Model
     {
@@ -52,9 +25,15 @@ namespace OpenGLCompGraph
         List<Vector3> vertices;
         List<Vector3> normals;
 
+        Vector3 rotation = Vector3.Zero;
+        Vector3 translation = Vector3.Zero;
+        Vector3 scalar = Vector3.One;
+
         List<Face> faces;
 
         Face[] faceArray;
+
+        public Matrix4 transform;
 
         public Model(string filepath)
         {
@@ -64,6 +43,8 @@ namespace OpenGLCompGraph
             normals = new List<Vector3>();
             faces = new List<Face>();
 
+            transform = Matrix4.Identity;
+            rotation = Vector3.Zero;
         }
 
         public bool IsReady()
@@ -85,9 +66,9 @@ namespace OpenGLCompGraph
 
             for (int index = 0; index < faces.Count(); index++)
             {
-                uint vertexIndex0 = faces[index].a;
-                uint vertexIndex1 = faces[index].b;
-                uint vertexIndex2 = faces[index].c;
+                uint vertexIndex0 = faces[index].vert0;
+                uint vertexIndex1 = faces[index].vert1;
+                uint vertexIndex2 = faces[index].vert2;
 
                 Vector3 vert0 = vertices[(int)vertexIndex0];
                 Vector3 vert1 = vertices[(int)vertexIndex1];
@@ -113,20 +94,19 @@ namespace OpenGLCompGraph
         {
             using (var sr = new StreamReader(filePath, Encoding.UTF8))
             {
-                string line;
-                string lineType;
-
+                string   line      ;
+                string   lineType  ;
                 string[] lineTokens;
-                
+
                 //reads obj file line by line to determine type of information and adds data to specified lists
                 while ((line = sr.ReadLine()) != null)
                 {
                     StringReader lineStream = new StringReader(line);
 
                     lineTokens = line.Split(' ');
-                    
+
                     lineType = lineTokens[0];
-                                                                          
+
                     if (lineType.Equals("v"))
                     {
                         Vector3 newVector = new Vector3();
@@ -141,12 +121,11 @@ namespace OpenGLCompGraph
                     {
                         Face newface = new Face();
 
-                        newface.a = uint.Parse(lineTokens[1]) - 1;
-                        newface.b = uint.Parse(lineTokens[2]) - 1;
-                        newface.c = uint.Parse(lineTokens[3]) - 1;
+                        newface.vert0 = uint.Parse(lineTokens[1]) - 1;
+                        newface.vert1 = uint.Parse(lineTokens[2]) - 1;
+                        newface.vert2 = uint.Parse(lineTokens[3]) - 1;
 
                         faces.Add(newface);
-
                     }
                 }
 
@@ -182,8 +161,57 @@ namespace OpenGLCompGraph
             faceArray = faces.ToArray();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferID);
             GL.BufferData(BufferTarget.ElementArrayBuffer, faces.Count * ListExtras.FaceSizeInBytes, faceArray, BufferUsageHint.StaticDraw);
-            Console.Write(GL.GetError());
+            //Console.Write(GL.GetError());
             GL.BindVertexArray(0);
+        }
+
+        public void RotateModelByYAxis(double deltaTime)
+        {
+            rotation[1] += 1.0f * (float)deltaTime;      
+        }
+
+        public void TranslateModelUp   (double deltaTime)
+        {            
+            translation[1] += 1.0f * (float)deltaTime;               
+        }
+        public void TranslateModelDown (double deltaTime)
+        {           
+            translation[1] -= 1.0f * (float)deltaTime;            
+        }
+        public void TranslateModelLeft (double deltaTime)
+        {           
+            translation[0] -= 1.0f * (float)deltaTime;           
+        }
+        public void TranslateModelRight(double deltaTime)
+        {            
+            translation[0] += 1.0f * (float)deltaTime;            
+        }
+
+        public void UpScaleModel(double deltaTime)
+        {
+            scalar[0] += 1.0f * (float)deltaTime;
+            scalar[1] += 1.0f * (float)deltaTime;
+            scalar[2] += 1.0f * (float)deltaTime;
+
+            Console.WriteLine(scalar);
+        }
+        public void DownScaleModel(double deltaTime)
+        {
+            scalar[0] -= 1.0f * (float)deltaTime;
+            scalar[1] -= 1.0f * (float)deltaTime;
+            scalar[2] -= 1.0f * (float)deltaTime;
+            Console.WriteLine(scalar);
+        }
+
+        public void UpdateTransform()
+        {
+            transform = Matrix4.Identity;
+            //Rotation about Y
+            transform *= Matrix4.CreateRotationY(rotation[1]);
+            //Translation modifying x and y
+            transform *= Matrix4.CreateTranslation(translation);
+            //Scale by all axis equally
+            transform *= Matrix4.CreateScale(scalar);
         }
 
         public void RenderModel()
@@ -202,4 +230,32 @@ namespace OpenGLCompGraph
 
         }
     }
+
+    public static class ListExtras
+    {
+        public static void Resize<T>(this List<T> list, int size, T element = default(T))
+        {
+            int count = list.Count;
+
+            if (size < count)
+            {
+                list.RemoveRange(size, count - size);
+            }
+            else if (size > count)
+            {
+                if (size > list.Capacity)
+                {
+                    list.Capacity = size;
+                }
+
+                list.AddRange(Enumerable.Repeat(element, size - count));
+            }
+        }
+
+        public static int FaceSizeInBytes = sizeof(uint) * 3;
+    }
+    
+
+
+
 }

@@ -12,52 +12,6 @@ namespace OpenGL_TK
     // color of the cube over time.
     public class Window : GameWindow
     {
-        private readonly float[] _vertices =
-        {
-             // Position          Normal
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, // Front face
-             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f, // Back face
-             0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, // Left face
-            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f, // Right face
-             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f, // Bottom face
-             0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, // Top face
-             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-        };
-
         private readonly Vector3 _lightPos = new Vector3(1.2f, 1.0f, 2.0f);
 
         private int _vertexBufferObject;
@@ -98,34 +52,6 @@ namespace OpenGL_TK
             importedModel.LoadModel();
             importedModel.BufferModel();
                                           
-            //_vertexBufferObject = GL.GenBuffer();
-            //GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-            //GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
-
-
-
-            //_vertexArrayObject_Model = GL.GenVertexArray();
-            //GL.BindVertexArray(_vertexArrayObject_Model);
-
-            //GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-
-            //var positionLocation = _modelShader.GetAttribLocation("aPos");
-            //GL.EnableVertexAttribArray(positionLocation);
-            //GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-
-            //var normalLocation = _modelShader.GetAttribLocation("aNormal");
-            //GL.EnableVertexAttribArray(normalLocation);
-            //GL.VertexAttribPointer(normalLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-
-            //_vertexArrayObject_Lamp = GL.GenVertexArray();
-            //GL.BindVertexArray(_vertexArrayObject_Lamp);
-
-            //GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-
-            //positionLocation = _lampShader.GetAttribLocation("aPos");
-            //GL.EnableVertexAttribArray(positionLocation);
-            //GL.VertexAttribPointer(positionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-
             base.OnLoad(e);
         }
 
@@ -137,14 +63,12 @@ namespace OpenGL_TK
 
             _modelShader.Use();
 
-            _modelShader.SetMatrix4("model", Matrix4.Identity);
-            _modelShader.SetMatrix4("view", _camera.GetViewMatrix());
+            _modelShader.SetMatrix4("model"     , importedModel.transform);
+            _modelShader.SetMatrix4("view"      , _camera.GetViewMatrix());
             _modelShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
+            _modelShader.SetVector3("viewPos"   , _camera.Position);
 
-            _modelShader.SetVector3("viewPos", _camera.Position);
-
-            // Here we set the material values of the cube, the material struct is just a container so to access
-            // the underlying values we simply type "material.value" to get the location of the uniform
+            // Here we set the material values of the cube
             _modelShader.SetVector3("material.ambient", new Vector3(1.0f, 0.5f, 0.31f));
             _modelShader.SetVector3("material.diffuse", new Vector3(1.0f, 0.5f, 0.31f));
             _modelShader.SetVector3("material.specular", new Vector3(0.5f, 0.5f, 0.5f));
@@ -171,6 +95,7 @@ namespace OpenGL_TK
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             importedModel.RenderModel();
+            importedModel.UpdateTransform();
 
             GL.BindVertexArray(_vertexArrayObject_Model);
 
@@ -233,6 +158,34 @@ namespace OpenGL_TK
             if (input.IsKeyDown(Key.LShift))
             {
                 _camera.Position -= _camera.Up * cameraSpeed * (float)e.Time; // Down
+            }
+            if (input.IsKeyDown(Key.R))
+            {
+                importedModel.RotateModelByYAxis(e.Time);
+            }
+            if (input.IsKeyDown(Key.Up))
+            {
+                importedModel.TranslateModelUp(e.Time);
+            }
+            if (input.IsKeyDown(Key.Left))
+            {
+                importedModel.TranslateModelLeft(e.Time);
+            }
+            if (input.IsKeyDown(Key.Down))
+            {
+                importedModel.TranslateModelDown(e.Time);
+            }
+            if (input.IsKeyDown(Key.Right))
+            {
+                importedModel.TranslateModelRight(e.Time);
+            }
+            if (input.IsKeyDown(Key.Minus))
+            {
+                importedModel.DownScaleModel(e.Time);
+            }
+            if (input.IsKeyDown(Key.Plus))
+            {
+                importedModel.UpScaleModel(e.Time);
             }
 
             var mouse = Mouse.GetState();

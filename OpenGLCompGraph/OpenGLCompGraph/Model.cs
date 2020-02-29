@@ -163,28 +163,26 @@ namespace OpenGLCompGraph
             _vertexArrayID = GL.GenBuffer();
             _normalBufferID = GL.GenBuffer();
             _elementBufferID = GL.GenBuffer();
-
             //vertex position buffer
             GL.BindVertexArray(_vertexArrayID);
             GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferID);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes, vertices.ToArray(), BufferUsageHint.StaticDraw);
-            GL.VertexAttribFormat(0, Vector3.SizeInBytes, VertexAttribType.Float, false, 0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(0);
 
-            //normal buffer
+            ////normal buffer
             if (normals.Count != 0)
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _normalBufferID);
                 GL.BufferData(BufferTarget.ArrayBuffer, normals.Count * Vector3.SizeInBytes, normals.ToArray(), BufferUsageHint.StaticDraw);
-                GL.VertexAttribFormat(1, Vector3.SizeInBytes, VertexAttribType.Float, false, 0);
+                GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
                 GL.EnableVertexAttribArray(1);
             }
 
             faceArray = faces.ToArray();
-
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferID);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, faces.Count * ListExtras.FaceSizeInBytes, faces.ToArray(), BufferUsageHint.StaticDraw);
-
+            GL.BufferData(BufferTarget.ElementArrayBuffer, faces.Count * ListExtras.FaceSizeInBytes, faceArray, BufferUsageHint.StaticDraw);
+            Console.Write(GL.GetError());
             GL.BindVertexArray(0);
         }
 
@@ -196,7 +194,7 @@ namespace OpenGLCompGraph
 
             GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, sizeRef);
 
-            int count = ((int)sizeRef[0] / ListExtras.FaceSizeInBytes);
+            int count = ((int)sizeRef[0] / sizeof(uint));
 
             GL.DrawElements(PrimitiveType.Triangles, count, DrawElementsType.UnsignedInt, 0);
 

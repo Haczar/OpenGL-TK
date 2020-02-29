@@ -94,7 +94,7 @@ namespace OpenGL_TK
             _camera = new Camera(Vector3.UnitZ * 3, Width / (float)Height);
 
             //Model Load
-            importedModel = new Model("Models/bunny.obj");
+            importedModel = new Model("Models/gargoyle.obj");
             importedModel.LoadModel();
             importedModel.BufferModel();
                                           
@@ -133,7 +133,7 @@ namespace OpenGL_TK
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            //GL.BindVertexArray(_vertexArrayObject_Model);
+            GL.BindVertexArray(_vertexArrayObject_Model);
 
             _modelShader.Use();
 
@@ -166,11 +166,13 @@ namespace OpenGL_TK
             _modelShader.SetVector3("light.diffuse", diffuseColor);
             _modelShader.SetVector3("light.specular", new Vector3(1.0f, 1.0f, 1.0f));
 
-            //GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
+
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             importedModel.RenderModel();
 
-            //GL.BindVertexArray(_vertexArrayObject_Model);
+            GL.BindVertexArray(_vertexArrayObject_Model);
 
             _lampShader.Use();
 
@@ -181,11 +183,9 @@ namespace OpenGL_TK
             _lampShader.SetMatrix4("model", lampMatrix);
             _lampShader.SetMatrix4("view", _camera.GetViewMatrix());
             _lampShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
-
+            
             GL.BindVertexArray(_vertexArrayObject_Lamp);
-
-
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
             GL.BindVertexArray(0);
 
             SwapBuffers();

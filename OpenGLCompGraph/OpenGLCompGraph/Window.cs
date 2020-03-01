@@ -6,10 +6,6 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 namespace OpenGL_TK
 {
-    // In this tutorial we take the code from the last tutorial and create some level of abstraction over it allowing more
-    // control of the interaction between the light and the material.
-    // At the end of the web version of the tutorial we also had a bit of fun creating a disco light that changes
-    // color of the cube over time.
     public class Window : GameWindow
     {
         private readonly Vector3 _lightPos = new Vector3(1.2f, 1.0f, 2.0f);
@@ -48,10 +44,17 @@ namespace OpenGL_TK
             _camera = new Camera(Vector3.UnitZ * 3, Width / (float)Height);
 
             //Model Load
-            importedModel = new Model("Models/gargoyle.obj");
+            //importedModel = new Model("Models/gargoyle.obj");
+            importedModel = new Model("Models/bunny.obj");
+            //importedModel = new Model("Models/eight.obj");
+            //importedModel = new Model("Models/hand.obj");
+            //importedModel = new Model("Models/horse.obj");
+            //importedModel = new Model("Models/sculpture.obj");
+            //importedModel = new Model("Models/topology.obj");
+            //importedModel = new Model("Models/torus.obj");
+
             importedModel.LoadModel();
-            importedModel.BufferModel();
-                                          
+            importedModel.BufferModel();              
             base.OnLoad(e);
         }
 
@@ -69,10 +72,10 @@ namespace OpenGL_TK
             _modelShader.SetVector3("viewPos"   , _camera.Position);
 
             // Here we set the material values of the cube
-            _modelShader.SetVector3("material.ambient", new Vector3(1.0f, 0.5f, 0.31f));
-            _modelShader.SetVector3("material.diffuse", new Vector3(1.0f, 0.5f, 0.31f));
+            _modelShader.SetVector3("material.ambient" , new Vector3(1.0f, 0.5f, 0.31f));
+            _modelShader.SetVector3("material.diffuse" , new Vector3(1.0f, 0.5f, 0.31f));
             _modelShader.SetVector3("material.specular", new Vector3(0.5f, 0.5f, 0.5f));
-            _modelShader.SetFloat("material.shininess", 32.0f);
+            _modelShader.SetFloat("material.shininess" , 32.0f);
 
             // This is where we change the lights color over time using the sin function
             Vector3 lightColor;
@@ -89,8 +92,6 @@ namespace OpenGL_TK
             _modelShader.SetVector3("light.ambient", ambientColor);
             _modelShader.SetVector3("light.diffuse", diffuseColor);
             _modelShader.SetVector3("light.specular", new Vector3(1.0f, 1.0f, 1.0f));
-
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -110,7 +111,6 @@ namespace OpenGL_TK
             _lampShader.SetMatrix4("projection", _camera.GetProjectionMatrix());
             
             GL.BindVertexArray(_vertexArrayObject_Lamp);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 36);
             GL.BindVertexArray(0);
 
             SwapBuffers();
@@ -127,14 +127,13 @@ namespace OpenGL_TK
 
             var input = Keyboard.GetState();
 
+            const float cameraSpeed = 1.5f;
+            const float sensitivity = 0.2f;
+
             if (input.IsKeyDown(Key.Escape))
             {
                 Exit();
             }
-
-            const float cameraSpeed = 1.5f;
-            const float sensitivity = 0.2f;
-
             if (input.IsKeyDown(Key.W))
             {
                 _camera.Position += _camera.Front * cameraSpeed * (float)e.Time; // Forward

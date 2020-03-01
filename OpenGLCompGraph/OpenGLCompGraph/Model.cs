@@ -25,9 +25,9 @@ namespace OpenGLCompGraph
         List<Vector3> vertices;
         List<Vector3> normals;
 
-        Vector3 rotation = Vector3.Zero;
+        Vector3 rotation    = Vector3.Zero;
         Vector3 translation = Vector3.Zero;
-        Vector3 scalar = Vector3.One;
+        Vector3 scalar      = Vector3.One;
 
         List<Face> faces;
 
@@ -40,11 +40,11 @@ namespace OpenGLCompGraph
             this.filePath = filepath;
 
             vertices = new List<Vector3>();
-            normals = new List<Vector3>();
-            faces = new List<Face>();
+            normals  = new List<Vector3>();
+            faces    = new List<Face>();
 
             transform = Matrix4.Identity;
-            rotation = Vector3.Zero;
+            rotation  = Vector3.Zero;
         }
 
         public bool IsReady()
@@ -187,20 +187,17 @@ namespace OpenGLCompGraph
             translation[0] += 1.0f * (float)deltaTime;            
         }
 
-        public void UpScaleModel(double deltaTime)
+        public void UpScaleModel  (double deltaTime)
         {
-            scalar[0] += 1.0f * (float)deltaTime;
-            scalar[1] += 1.0f * (float)deltaTime;
-            scalar[2] += 1.0f * (float)deltaTime;
-
-            Console.WriteLine(scalar);
+            scalar[0] += 0.25f * (float)deltaTime;
+            scalar[1] += 0.25f * (float)deltaTime;
+            scalar[2] += 0.25f * (float)deltaTime;
         }
         public void DownScaleModel(double deltaTime)
         {
-            scalar[0] -= 1.0f * (float)deltaTime;
-            scalar[1] -= 1.0f * (float)deltaTime;
-            scalar[2] -= 1.0f * (float)deltaTime;
-            Console.WriteLine(scalar);
+            scalar[0] -= 0.25f * (float)deltaTime;
+            scalar[1] -= 0.25f * (float)deltaTime;
+            scalar[2] -= 0.25f * (float)deltaTime;
         }
 
         public void UpdateTransform()
@@ -254,8 +251,4 @@ namespace OpenGLCompGraph
 
         public static int FaceSizeInBytes = sizeof(uint) * 3;
     }
-    
-
-
-
 }
